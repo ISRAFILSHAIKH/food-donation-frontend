@@ -24,4 +24,4 @@ const StatCard = ({ label, value, icon, color = 'green', sub }) => {
   );
 };
 
-export default StatCard;
+export default statcard;

@@ -3,7 +3,7 @@ import { useAuth } from '../../context/Authcontext';
 import api from '../../utils/api';
 import { formatDate, statusClass, prettyStatus, isExpired } from '../../utils/helpers';
 import toast from 'react-hot-toast';
-import StatCard from '../../components/StatCard';
+import statcard from '../../components/statcard';
 import { FiPlus, FiX, FiPackage, FiClock, FiMapPin } from 'react-icons/fi';
 
 const INDIA_STATES = [
@@ -102,10 +102,10 @@ const DonorDashboard = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <StatCard label="Total Donations" value={stats.total}     icon="📦" color="blue"   />
-          <StatCard label="Pending Review"  value={stats.pending}   icon="⏳" color="yellow" />
-          <StatCard label="In Progress"     value={stats.active}    icon="🚴" color="purple" />
-          <StatCard label="Delivered"       value={stats.delivered} icon="✅" color="green"  />
+          <statcard label="Total Donations" value={stats.total}     icon="📦" color="blue"   />
+          <statcard label="Pending Review"  value={stats.pending}   icon="⏳" color="yellow" />
+          <statcard label="In Progress"     value={stats.active}    icon="🚴" color="purple" />
+          <statcard label="Delivered"       value={stats.delivered} icon="✅" color="green"  />
         </div>
 
         {/* Donation list */}

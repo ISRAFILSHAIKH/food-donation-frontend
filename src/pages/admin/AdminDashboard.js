@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../../utils/api';
 import { formatDate, statusClass, prettyStatus } from '../../utils/helpers';
 import toast from 'react-hot-toast';
-import StatCard from '../../components/StatCard';
+import statcard from '../../components/statcard';
 import { FiRefreshCw, FiCheck, FiX, FiUsers, FiPackage } from 'react-icons/fi';
 
 const TABS = ['overview', 'donations', 'users'];
@@ -116,16 +116,16 @@ const AdminDashboard = () => {
           /* ── Overview tab ── */
           <div className="space-y-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard label="Total Users"      value={stats?.totalUsers}      icon="👥" color="blue"   />
-              <StatCard label="Donors"           value={stats?.totalDonors}     icon="🎁" color="green"  />
-              <StatCard label="Volunteers"       value={stats?.totalVolunteers} icon="🚴" color="purple" />
-              <StatCard label="Total Donations"  value={stats?.totalDonations}  icon="📦" color="orange" />
+              <statcard label="Total Users"      value={stats?.totalUsers}      icon="👥" color="blue"   />
+              <statcard label="Donors"           value={stats?.totalDonors}     icon="🎁" color="green"  />
+              <statcard label="Volunteers"       value={stats?.totalVolunteers} icon="🚴" color="purple" />
+              <statcard label="Total Donations"  value={stats?.totalDonations}  icon="📦" color="orange" />
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard label="Pending Review"   value={stats?.pendingDonations}   icon="⏳" color="yellow" />
-              <StatCard label="Approved"         value={stats?.approvedDonations}  icon="✅" color="green"  />
-              <StatCard label="Delivered"        value={stats?.deliveredDonations} icon="🎉" color="blue"   />
-              <StatCard label="Total Deliveries" value={stats?.totalDeliveries}    icon="🛵" color="orange" />
+              <statcard label="Pending Review"   value={stats?.pendingDonations}   icon="⏳" color="yellow" />
+              <statcard label="Approved"         value={stats?.approvedDonations}  icon="✅" color="green"  />
+              <statcard label="Delivered"        value={stats?.deliveredDonations} icon="🎉" color="blue"   />
+              <statcard label="Total Deliveries" value={stats?.totalDeliveries}    icon="🛵" color="orange" />
             </div>
 
             {/* Recent donations preview */}

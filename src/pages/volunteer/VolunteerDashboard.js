@@ -3,7 +3,7 @@ import { useAuth } from '../../context/Authcontext';
 import api from '../../utils/api';
 import { formatDate, statusClass, prettyStatus } from '../../utils/helpers';
 import toast from 'react-hot-toast';
-import StatCard from '../../components/StatCard';
+import statcard from '../../components/statcard';
 import { FiTruck, FiCheckCircle, FiPackage, FiRefreshCw, FiMapPin, FiAlertCircle } from 'react-icons/fi';
 
 const INDIA_STATES = [
@@ -180,10 +180,10 @@ const VolunteerDashboard = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <StatCard label="Available Tasks" value={stats.available} icon="📦" color="blue"   />
-          <StatCard label="Accepted"         value={stats.accepted}  icon="🤝" color="purple" />
-          <StatCard label="Picked Up"        value={stats.pickedUp}  icon="🛵" color="orange" />
-          <StatCard label="Delivered"        value={stats.delivered} icon="✅" color="green"  />
+          <statcard label="Available Tasks" value={stats.available} icon="📦" color="blue"   />
+          <statcard label="Accepted"         value={stats.accepted}  icon="🤝" color="purple" />
+          <statcard label="Picked Up"        value={stats.pickedUp}  icon="🛵" color="orange" />
+          <statcard label="Delivered"        value={stats.delivered} icon="✅" color="green"  />
         </div>
 
         {/* Tabs */}
