@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateUser = (updatedUserData) => {
-  setUser(prev => ({ ...prev, ...updatedUserData }));
+    setUser(prev => ({ ...(prev || {}), ...updatedUserData }));
   };
 
   const logout = () => {
@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <Authcontext.Provider value={{ user, token, loading, login, logout }}>
+    <Authcontext.Provider value={{ user, token, loading, login, updateUser, logout }}>
       {children}
     </Authcontext.Provider>
   );
