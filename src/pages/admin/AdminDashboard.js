@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../../utils/api';
 import { formatDate, statusClass, prettyStatus } from '../../utils/helpers';
 import toast from 'react-hot-toast';
-import StatCard from '../../components/statcard';
+import StatCard from '../../components/StatCard';
 import { FiRefreshCw, FiCheck, FiX, FiUsers, FiPackage } from 'react-icons/fi';
 
 const TABS = ['overview', 'donations', 'users'];

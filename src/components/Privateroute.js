@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/Authcontext';
 
-const PrivateRoute = ({ children, role }) => {
+const Privateroute = ({ children, role }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -22,4 +22,4 @@ const PrivateRoute = ({ children, role }) => {
   return children;
 };
 
-export default PrivateRoute;
+export default Privateroute;

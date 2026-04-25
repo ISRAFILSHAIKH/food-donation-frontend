@@ -3,17 +3,27 @@ import { useAuth } from '../../context/Authcontext';
 import api from '../../utils/api';
 import { formatDate, statusClass, prettyStatus, isExpired } from '../../utils/helpers';
 import toast from 'react-hot-toast';
-import StatCard from '../../components/statcard';
-import { FiPlus, FiX, FiPackage, FiClock, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import StatCard from '../../components/StatCard';
+import { FiPlus, FiX, FiPackage, FiClock, FiMapPin } from 'react-icons/fi';
 
-const INITIAL_FORM = { foodName: '', quantity: '', location: '', expiryTime: '', description: '' };
+const INDIA_STATES = [
+  "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh",
+  "Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka",
+  "Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram",
+  "Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana",
+  "Tripura","Uttar Pradesh","Uttarakhand","West Bengal",
+  "Andaman and Nicobar Islands","Chandigarh","Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi","Jammu and Kashmir","Ladakh","Lakshadweep","Puducherry"
+];
+
+const INITIAL_FORM = { foodName: '', quantity: '', location: '', state: '', city: '', expiryTime: '', description: '' };
 
 const DonorDashboard = () => {
   const { user } = useAuth();
-  const [donations, setDonations] = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [form, setForm]           = useState(INITIAL_FORM);
+  const [donations, setDonations]   = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [showModal, setShowModal]   = useState(false);
+  const [form, setForm]             = useState(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
 
   const fetchDonations = useCallback(async () => {
@@ -29,8 +39,22 @@ const DonorDashboard = () => {
 
   useEffect(() => { fetchDonations(); }, [fetchDonations]);
 
+  // Pre-fill state/city from user profile
+  const openModal = () => {
+    setForm({
+      ...INITIAL_FORM,
+      state: user.state || '',
+      city:  user.city  || '',
+    });
+    setShowModal(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.state || !form.city.trim()) {
+      toast.error('Please select state and enter city');
+      return;
+    }
     setSubmitting(true);
     try {
       await api.post('/donations', form);
@@ -45,15 +69,13 @@ const DonorDashboard = () => {
     }
   };
 
-  // Stats
   const stats = {
     total:     donations.length,
     pending:   donations.filter(d => d.status === 'pending').length,
-    active:    donations.filter(d => ['approved', 'accepted', 'picked_up'].includes(d.status)).length,
+    active:    donations.filter(d => ['approved','accepted','picked_up'].includes(d.status)).length,
     delivered: donations.filter(d => d.status === 'delivered').length,
   };
 
-  // Min datetime for expiry input (now)
   const minDateTime = new Date(Date.now() + 60 * 60 * 1000).toISOString().slice(0, 16);
 
   return (
@@ -63,14 +85,18 @@ const DonorDashboard = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="font-display text-3xl font-bold text-gray-900">
-              Hello, {user.name.split(' ')[0]} 👋
-            </h1>
-            <p className="text-gray-500 mt-1">Manage your food donations</p>
+            <h1 className="font-display text-3xl font-bold text-gray-900">Hello, {user.name.split(' ')[0]} 👋</h1>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-gray-500">Manage your food donations</p>
+              {user.state && (
+                <span className="flex items-center gap-1 text-xs bg-brand-50 text-brand-700 border border-brand-200 px-2 py-0.5 rounded-full">
+                  <FiMapPin className="w-3 h-3" /> {user.city}, {user.state}
+                </span>
+              )}
+            </div>
           </div>
-          <button onClick={() => setShowModal(true)} className="btn-primary flex items-center gap-2">
-            <FiPlus className="w-4 h-4" />
-            <span>Add Donation</span>
+          <button onClick={openModal} className="btn-primary flex items-center gap-2">
+            <FiPlus className="w-4 h-4" /> Add Donation
           </button>
         </div>
 
@@ -92,7 +118,7 @@ const DonorDashboard = () => {
             <div className="text-5xl mb-3">🍱</div>
             <h3 className="font-display text-xl font-semibold text-gray-700 mb-1">No donations yet</h3>
             <p className="text-gray-400 text-sm mb-5">Add your first donation to get started</p>
-            <button onClick={() => setShowModal(true)} className="btn-primary inline-flex items-center gap-2">
+            <button onClick={openModal} className="btn-primary inline-flex items-center gap-2">
               <FiPlus className="w-4 h-4" /> Add Donation
             </button>
           </div>
@@ -103,35 +129,35 @@ const DonorDashboard = () => {
               <div key={d._id} className="card hover:shadow-md transition-shadow">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="flex items-center gap-3 mb-2 flex-wrap">
                       <h3 className="font-display font-semibold text-gray-900 text-lg">{d.foodName}</h3>
                       <span className={statusClass(d.status)}>{prettyStatus(d.status)}</span>
                       {isExpired(d.expiryTime) && d.status !== 'delivered' && (
                         <span className="badge bg-red-100 text-red-700">Expired</span>
                       )}
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm text-gray-600">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm text-gray-600">
                       <div className="flex items-center gap-1.5">
-                        <FiPackage className="w-3.5 h-3.5 text-gray-400" />
-                        <span>{d.quantity}</span>
+                        <FiPackage className="w-3.5 h-3.5 text-gray-400" /> {d.quantity}
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-gray-400">📍</span>
-                        <span className="truncate">{d.location}</span>
+                        <FiMapPin className="w-3.5 h-3.5 text-gray-400" />
+                        <span className="truncate">{d.city}, {d.state}</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <FiClock className="w-3.5 h-3.5 text-gray-400" />
-                        <span>Expires: {formatDate(d.expiryTime)}</span>
+                      <div className="flex items-center gap-1.5 col-span-2">
+                        <FiClock className="w-3.5 h-3.5 text-gray-400" /> Expires: {formatDate(d.expiryTime)}
                       </div>
                     </div>
-                    {d.description && (
-                      <p className="mt-2 text-sm text-gray-400 italic">{d.description}</p>
-                    )}
+                    <p className="text-xs text-gray-400 mt-1">📍 {d.location}</p>
+                    {d.description && <p className="mt-2 text-sm text-gray-400 italic">{d.description}</p>}
                   </div>
                   {d.assignedVolunteer && (
                     <div className="bg-blue-50 border border-blue-100 rounded-xl px-3 py-2 text-sm">
                       <p className="text-xs text-blue-500 font-medium mb-0.5">Volunteer</p>
                       <p className="font-semibold text-blue-800">{d.assignedVolunteer.name}</p>
+                      {d.assignedVolunteer.city && (
+                        <p className="text-xs text-blue-400">{d.assignedVolunteer.city}, {d.assignedVolunteer.state}</p>
+                      )}
                     </div>
                   )}
                 </div>
@@ -145,14 +171,16 @@ const DonorDashboard = () => {
       {/* Add Donation Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md animate-slide-up">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg animate-slide-up max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-white">
               <h3 className="font-display text-xl font-bold text-gray-900">Add Food Donation</h3>
               <button onClick={() => setShowModal(false)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
                 <FiX className="w-5 h-5" />
               </button>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
+
+              {/* Food details */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Food Name *</label>
                 <input type="text" value={form.foodName} onChange={e => setForm({...form, foodName: e.target.value})}
@@ -163,11 +191,50 @@ const DonorDashboard = () => {
                 <input type="text" value={form.quantity} onChange={e => setForm({...form, quantity: e.target.value})}
                   required placeholder="e.g. 10 plates, 5 kg, 20 boxes" className="input-field" />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Pickup Location *</label>
-                <input type="text" value={form.location} onChange={e => setForm({...form, location: e.target.value})}
-                  required placeholder="e.g. 123 MG Road, Pune" className="input-field" />
+
+              {/* Location section */}
+              <div className="bg-orange-50 border border-orange-100 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <FiMapPin className="w-4 h-4 text-orange-500" />
+                  <span className="text-sm font-semibold text-orange-800">Pickup Location</span>
+                </div>
+                <p className="text-xs text-orange-600 mb-3">
+                  🚴 Volunteers from the same state will be notified about this donation.
+                  Donations across different states cannot be fulfilled.
+                </p>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">State / UT *</label>
+                    <select value={form.state} onChange={e => setForm({...form, state: e.target.value})}
+                      required className="input-field text-sm">
+                      <option value="">Select state</option>
+                      {INDIA_STATES.map(st => <option key={st} value={st}>{st}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">City *</label>
+                    <input type="text" value={form.city} onChange={e => setForm({...form, city: e.target.value})}
+                      required placeholder="e.g. Mumbai, Pune, Nashik" className="input-field text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Full Pickup Address *</label>
+                    <input type="text" value={form.location} onChange={e => setForm({...form, location: e.target.value})}
+                      required placeholder="e.g. 123 MG Road, near Pune Railway Station" className="input-field text-sm" />
+                  </div>
+                </div>
+
+                {/* Same-state warning */}
+                {form.state && user.state && form.state !== user.state && (
+                  <div className="mt-3 p-2.5 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-xs text-red-700">
+                      ⚠️ You selected <strong>{form.state}</strong> but your profile is set to <strong>{user.state}</strong>.
+                      Make sure this is the correct pickup state.
+                    </p>
+                  </div>
+                )}
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Expiry Date & Time *</label>
                 <input type="datetime-local" value={form.expiryTime} min={minDateTime}
@@ -179,6 +246,7 @@ const DonorDashboard = () => {
                 <textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})}
                   placeholder="Any details about the food..." rows={2} className="input-field resize-none" />
               </div>
+
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setShowModal(false)} className="btn-secondary flex-1">Cancel</button>
                 <button type="submit" disabled={submitting} className="btn-primary flex-1 flex items-center justify-center gap-2">
